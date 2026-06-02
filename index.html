@@ -47,6 +47,18 @@
       width: 122px;
     }
   </style>
+
+  <script src="https://cdn.trackjs.com/agent/v3/latest/t.js"></script>
+  <script>
+
+    window.TrackJS && TrackJS.install({ 
+
+      token: "aa556520632d41968d6360718059fd1e"
+    // for more configuration options, see https://docs.trackjs.com
+  });
+</script>
+
+
 </head>
 
 <body>
@@ -88,6 +100,18 @@
   </main>
 
   <script>
+    window.onerror = function (message, source, lineno, colno, error) {
+      console.log("Error Message: ", message);
+      console.log(`File Source: ${source}, Line: ${lineno}:${colno}`);
+      console.log("Error Object: ", error);
+    };
+
+    class calcNumError extends Error {
+      constructor(message) {
+        super(message);
+        this.name = "calcNumError";
+      }
+    }
     let form = document.querySelector('form');
     form.addEventListener('submit', e => {
       e.preventDefault();
@@ -95,13 +119,166 @@
       let firstNum = document.querySelector('#first-num').value;
       let secondNum = document.querySelector('#second-num').value;
       let operator = document.querySelector('#operator').value;
-      output.innerHTML = eval(`${firstNum} ${operator} ${secondNum}`);
+      let calc = document.querySelector('#calculate');
+
+      calc.disabled = true;
+
+      try {
+        if (firstNum === '' || secondNum === '')
+        {
+          throw new calcNumError('Both inputs must contain a number!');
+        }
+
+        let firstNumInt = Number(firstNum);
+        let secondNumInt = Number(secondNum);
+
+        if (Number.isNaN(firstNumInt) || Number.isNaN(secondNumInt)) {
+          throw new calcNumError('Invalid Type: One input or more is not a number!');
+        }
+
+        if (operator === '/' && secondNumInt === 0)
+        {
+          throw new RangeError('Division by Zero is not accepted!');
+        }
+
+        let calcResult;
+        switch (operator) {
+          case '+': calcResult = firstNumInt + secondNumInt; break;
+          case '-': calcResult = firstNumInt - secondNumInt; break;
+          case '*': calcResult = firstNumInt * secondNumInt; break;
+          case '/': calcResult = firstNumInt / secondNumInt; break;
+        }
+
+        output.innerHTML = calcResult;
+      }
+      catch (error)
+      {
+        console.error(`[Caught Application Error!] Type: ${error.name}, Message: ${error.message}`);
+        output.innerHTML = `Error! ${error.message}`;
+      }
+
+      finally {
+        calc.disabled = false;
+      }
     });
+
 
     let errorBtns = Array.from(document.querySelectorAll('#error-btns > button'));
 
     // Start your code here
-    // You may move this JS to another file if you wish
+    errorBtns.forEach(btn => {
+
+      btn.addEventListener('click', () => {
+
+
+        const action = btn.textContent.trim();
+        let LabLanguages = [
+
+          {
+
+            name: 'HTML', purpose: "Foundational",
+          },
+          {
+            name: 'CSS', purpose: "Style",
+          },
+          {
+            name: "JS", purpose: "Interactivity"
+          }
+        ];
+
+        const x = 4;
+        const y = 7;
+        const reason = 'y is expected to be less than x';
+
+        const label = 'Favorite Music Genres'
+
+        switch (action)
+        {
+
+
+          case 'Console Log':
+            console.log('Console Log Demo', "You got logged!");
+            break;
+        
+          case 'Console Error':
+
+            console.error("Console Error Demo", "Error! Error!");
+            break;
+
+
+          case 'Console Count':
+            console.count('Count Button');
+            break;
+          
+          case 'Console Table':
+            console.table(LabLanguages);
+            break;
+
+          case 'Console Warn':
+            console.warn('Console Warn Button');
+            break;
+
+          case 'Console Assert':
+            console.assert(y < x, {x,y,reason});
+            break;
+
+          case 'Console Clear':
+            console.clear();
+            break;
+
+          case 'Console Dir':
+            console.dir(btn);
+            break;
+
+          case 'Console dirxml':
+            console.dirxml(btn);
+            break;
+
+          case 'Console Group Start':
+            console.group('Buttons Pressed');
+            break;
+         case 'Console Group End':
+            console.groupEnd();
+            break;
+
+         case 'Start Timer':
+            console.time();
+            for (let i = 0; i < 100000; i++)
+            {
+              let square = i ** 2;
+            }
+            break;
+
+         case 'End Timer':
+            console.timeEnd();
+            break;
+
+         case 'Console Trace':
+            function first() {
+              second();
+            }
+            function second() {
+              third();
+            }
+            function third(){
+              console.trace('Console Trace Demo');
+            }
+            first();
+            break;
+      
+         case 'Trigger a Global Error':
+            console.log('Triggering a global error...')
+            if (window.TrackJS){
+
+              TrackJS.track('Testing TrackJS!');
+            }
+            idontknow.forceCrash();
+            break;
+        }
+      });
+
+
+    });
   </script>
 </body>
 
